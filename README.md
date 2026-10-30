@@ -1,4 +1,4 @@
-# Clarifo MCP server
+# Clarifo MCP server: SEC filings and Nordic financial data for Claude, ChatGPT and Cursor
 
 Clarifo is a financial research platform for US and Nordic listed companies.
 Its hosted, read-only MCP server lets AI assistants search company filings,
@@ -32,29 +32,72 @@ Data API key as a bearer token instead; see the documentation.
 
 ## Connect
 
-**Claude (web, desktop, mobile):** open the Clarifo listing in the
-[Claude Connectors Directory](https://claude.ai/directory/connectors/clarifo)
-and click **Connect**.
+### Claude (web, Claude Desktop, mobile)
 
-**ChatGPT:** add the Clarifo app from the
+1. Open the Clarifo listing in the
+   [Claude Connectors Directory](https://claude.ai/directory/connectors/clarifo)
+   and click **Connect**.
+2. Sign in with your Clarifo account when the OAuth window opens.
+
+The connector is stored on your Claude account, so it works the same in
+Claude Desktop (macOS, Windows), on the web and on mobile.
+
+If the directory is turned off for your workspace, add it as a custom
+connector: in Claude go to **Customize > Connectors**, click **+ Add >
+Add custom connector**, name it `Clarifo` and paste
+`https://mcp.clarifo.com/mcp`. On Team and Enterprise plans an owner adds it
+under **Organization settings > Connectors**, and members then click
+**Connect**.
+
+### Claude Code
+
+```bash
+claude mcp add --transport http --scope user clarifo https://mcp.clarifo.com/mcp
+```
+
+Then run `/mcp` inside Claude Code and choose Clarifo to sign in.
+
+### ChatGPT
+
+Add the Clarifo app from the
 [ChatGPT apps directory](https://chatgpt.com/plugins/plugin_asdk_app_6a620fee8fb081918a53bd0341a34664).
 
-**Config-file clients** (Claude Desktop format shown; Cursor's file layout is in the
-[documentation](https://www.clarifo.com/docs/mcp#config-file-cursor--others)):
+### Cursor
+
+Add to `~/.cursor/mcp.json` (or `.cursor/mcp.json` in a project):
 
 ```json
 {
   "mcpServers": {
     "clarifo": {
-      "url": "https://mcp.clarifo.com/mcp",
-      "auth": "oauth"
+      "url": "https://mcp.clarifo.com/mcp"
     }
   }
 }
 ```
 
-Restart the client after editing the config; the first request triggers the
-OAuth sign-in.
+### Claude Desktop config file (optional)
+
+`claude_desktop_config.json` only starts local servers, so the connector
+above is the recommended way. If you manage Claude Desktop through the config
+file, the [`mcp-remote`](https://github.com/geelen/mcp-remote) bridge
+(Node.js 18+) connects it to the hosted server:
+
+```json
+{
+  "mcpServers": {
+    "clarifo": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.clarifo.com/mcp"]
+    }
+  }
+}
+```
+
+The file is at `~/Library/Application Support/Claude/claude_desktop_config.json`
+on macOS and `%APPDATA%\Claude\claude_desktop_config.json` on Windows. Restart
+Claude Desktop after editing it; the first request opens the OAuth sign-in in
+your browser.
 
 ## Example prompts
 
